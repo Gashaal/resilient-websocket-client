@@ -1,0 +1,48 @@
+{
+  "name": "resilient-websocket-client",
+  "version": "0.0.1",
+  "description": "A small TypeScript WebSocket client with predictable reconnection behavior",
+  "keywords": [
+    "reconnect",
+    "typescript",
+    "websocket"
+  ],
+  "homepage": "https://github.com/Gashaal/resilient-websocket-client#readme",
+  "bugs": {
+    "url": "https://github.com/Gashaal/resilient-websocket-client/issues"
+  },
+  "license": "ISC",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gashaal/resilient-websocket-client.git"
+  },
+  "files": [
+    "dist",
+    "index.js",
+    "README.md"
+  ],
+  "type": "commonjs",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.test.json --noEmit && vitest run",
+    "type-check": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "knip": "knip",
+    "static-checks": "npm run type-check && npm run lint && npm run fmt:check && npm run knip",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.1",
+    "knip": "^6.35.1",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}
