@@ -12,7 +12,7 @@
     "url": "https://github.com/Gashaal/resilient-websocket-client/issues"
   },
   "license": "MIT",
-  "author": "",
+  "author": "Roman Dyachenko",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gashaal/resilient-websocket-client.git"
