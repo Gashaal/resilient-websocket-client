@@ -63,7 +63,7 @@ Numeric options are validated at construction: retry counts are non-negative
 integers, delays are positive with the maximum at least the initial delay,
 `jitterRatio` is between `0` and `1`, and queue capacity is a positive integer.
 
-## Reconnect Exceptions
+## Reconnection behavior
 
 When the current socket closes, retries use capped exponential backoff with
 configurable jitter. Synchronous WebSocket construction failures use the same
