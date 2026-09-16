@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/Gashaal/resilient-websocket-client/issues"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "",
   "repository": {
     "type": "git",
