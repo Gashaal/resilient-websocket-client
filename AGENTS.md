@@ -2,97 +2,98 @@
 
 ## Project Purpose
 
-This repository contains a small, framework-agnostic TypeScript WebSocket
-client intended as a focused engineering sample.
+This repository is a small, framework-agnostic TypeScript WebSocket client and
+focused engineering sample. It should demonstrate a clear public API,
+predictable connection lifecycle, resilient reconnect behavior, careful async
+race handling, strong types, and deterministic tests. Keep solutions explicit
+and avoid abstractions not justified by current requirements.
 
-The project should demonstrate clear API design, predictable connection
-lifecycle, resilience to network failures, careful handling of asynchronous
-race conditions, strong typing, and deterministic testing.
+## Clean-Room Requirement
 
-Keep the project deliberately small. Prefer explicit, readable solutions over
-abstractions that are not justified by current requirements.
+Implement the project independently. Do not copy, adapt, translate, or
+mechanically rewrite proprietary code from any current or previous employer.
+Do not introduce employer-specific APIs, event names, configuration, tests,
+comments, business logic, or documentation. Rely only on this repository's
+generic requirements and publicly available Web Platform behavior.
 
-## Clean-room Requirement
+## Project Structure and Modules
 
-This project must be implemented independently.
+- `src/websocket-client.ts` contains connection, retry, queue, and event logic.
+- `src/types.ts` defines public options, states, results, and typed events.
+- `src/index.ts` is the narrow TypeScript export surface.
+- `test/websocket-client.test.ts` contains deterministic Vitest tests and the
+  fake WebSocket implementation.
+- `package.json` defines the ESM package entry points and npm scripts.
+- `.github/workflows/ci.yml` runs checks, tests, and the build on Node.js 24.
+- `dist/index.js` and `dist/index.d.ts` are the generated JavaScript and type
+  entry points. The build also emits JavaScript, declarations, and source maps
+  for the other source modules.
+- `tsconfig.json` builds source; `tsconfig.test.json` also type-checks tests.
+- `knip.json` configures unused-code and dependency checks.
 
-Do not copy, adapt, translate, or mechanically rewrite proprietary code from
-any current or previous employer. Do not introduce employer-specific APIs,
-event names, configuration values, tests, comments, business logic, or
-documentation.
+The package is ESM-only and uses NodeNext module resolution. Include `.js` in
+relative import specifiers in both source and tests so emitted ESM resolves
+correctly. Put TypeScript implementation in `src/`, Vitest tests in `test/`,
+and generated output in `dist/`. The `dist/` directory and TypeScript build
+metadata are ignored; do not edit or commit generated artifacts.
 
-Implement functionality only from the generic requirements documented in this
-repository and publicly available Web Platform behavior.
+## Scope and Non-Goals
 
-## Project Structure
+Maintain explicit connect, disconnect, and reconnect operations; automatic
+retries with capped exponential backoff and jitter; configurable retry limits;
+a bounded FIFO send queue with observable drops; typed events and inspectable
+state; and guards against obsolete socket events. Use the browser WebSocket
+API and prefer zero runtime dependencies.
 
-Keep the public entry point small.
-
-Suggested structure:
-
-src/
-websocket-client.ts
-types.ts
-index.ts
-
-test/
-websocket-client.test.ts
-
-Place implementation under `src/` and tests under `test/`.
-
-## Scope
-
-The client should support:
-
-- WebSocket connection and manual disconnect;
-- manual reconnect;
-- automatic reconnect after unexpected disconnect;
-- exponential backoff with jitter;
-- configurable retry limits;
-- bounded FIFO outgoing message queue;
-- observable dropped-message behavior;
-- protection against events from obsolete WebSocket instances;
-- typed events;
-- inspection of connection state.
-
-Use the standard browser WebSocket API.
-
-## Non-goals
-
-Do not add unless explicitly requested:
-
-- React/Vue integrations;
-- Redux, Reatom, RxJS, or other state-management layers;
-- authentication;
-- persistence;
-- heartbeat protocols;
-- automatic JSON parsing;
-- schema validation;
-- state-machine libraries;
-- plugin systems;
-- demo applications;
-- UI components.
-
-Prefer zero runtime dependencies.
+Unless explicitly requested, do not add framework integrations, state
+management, authentication, persistence, heartbeats, JSON parsing, schema
+validation, state-machine libraries, plugins, demos, or UI components.
 
 ## Build, Test, and Development Commands
 
-- `npm install` installs dependencies and creates or updates the lockfile.
-- `npm test` builds the package and runs the complete Node test suite.
-- `npm run build` compiles TypeScript sources and declarations into `dist/`.
-- `node index.js` runs the package entry point once it exists and is useful for basic local smoke checks.
-- `npm pack --dry-run` previews the files that would be published without creating a release.
+- `npm ci`: install the exact dependency versions from `package-lock.json`, as
+  CI does.
+- `npm run build`: compile `src/**/*.ts` to ESM JavaScript, declarations,
+  declaration maps, and source maps in `dist/`.
+- `npm test`: type-check source and tests without emitting, then run Vitest once.
+- `npm run type-check`: type-check only production source without emitting.
+- `npm run lint` / `npm run lint:fix`: check or fix code with Oxlint.
+- `npm run fmt:check` / `npm run fmt`: check or apply Oxfmt formatting.
+- `npm run knip`: report unused files, exports, and dependencies.
+- `npm run static-checks`: run type-check, lint, format check, and Knip.
+- `npm run prepack`: run the production build used before package creation.
+- `npm pack --dry-run`: build via `prepack` and inspect publish contents.
 
-There is currently no lint, formatting, or development-server command. Add project scripts to `package.json` before relying on new tooling, and document them here.
+There is no watch mode or development server.
 
-## Coding Style & Naming Conventions
+CI runs `npm ci`, `npm run static-checks`, `npm test`, and `npm run build` on
+pull requests targeting `main`.
 
-Use CommonJS modules (`require` and `module.exports`) to match the package's `"type": "commonjs"`. Follow the style of surrounding code; until automated formatting is configured, use two-space indentation, semicolons, single quotes, and trailing commas in multiline structures. Name files with lowercase kebab-case, variables and functions with `camelCase`, and constructors or classes with `PascalCase`. Keep the exported API narrow and separate connection, retry, and event-handling concerns into focused modules.
+## Coding Style and Naming
+
+Follow Oxfmt: two-space indentation, semicolons, double quotes, and trailing
+commas in multiline constructs. Use strict TypeScript and preserve the checks
+enabled in `tsconfig.json`. Name files in lowercase kebab-case, variables and
+functions in `camelCase`, and classes, enums, and types in `PascalCase`. Keep
+the public exports narrow and use `import type` for type-only imports. Oxlint
+and Oxfmt currently use their defaults; there are no separate configuration
+files for either tool.
 
 ## Testing Guidelines
 
-Add tests with every behavior change, especially for reconnection timing, retry limits, message ordering, clean shutdown, and error propagation. Name tests `*.test.js` and avoid real network dependencies where deterministic fake WebSocket implementations or timers suffice. Once a framework is selected, ensure `npm test` runs the complete suite and exits nonzero on failure. No coverage threshold is configured yet; new core logic should include success, failure, and boundary cases.
+Write Vitest tests as `test/*.test.ts`; do not use real network connections.
+Use fake WebSockets and `vi.useFakeTimers()` for deterministic lifecycle and
+retry behavior. Every behavior change should cover success, failure, and
+relevant boundaries, especially retry timing and limits, timer cleanup, stale
+events, queue capacity and FIFO order, message retention, manual shutdown, and
+error propagation. Vitest currently runs without a separate configuration file,
+and no coverage threshold is configured. Run `npm test` and
+`npm run static-checks` before submitting.
 
-## Commit & Pull Request Guidelines
+## Commit and Pull Request Guidelines
 
-The history currently contains only `Initial commit`, so no established convention exists. Use short, imperative subjects such as `Add exponential reconnect backoff`, and keep each commit focused. Pull requests should explain the behavior and motivation, list verification commands and results, and link relevant issues. Include logs or concise reproduction steps for protocol and timing bugs; screenshots are only useful for changes that introduce visual documentation or demos.
+History is short and uses concise, imperative-style subjects. Keep commits
+focused; for example, `Add exponential reconnect backoff`. Pull requests should
+explain behavior and motivation, link relevant issues, and list verification
+commands and results. Include concise reproduction steps or logs for timing and
+protocol bugs. Screenshots are only relevant if visual documentation is added.
